@@ -1,0 +1,30 @@
+import pandas as pd
+from twilio.rest import Client
+
+# Your Account SID from twilio.com/console
+account_sid = "AC4ddb54c2b1ad8ff11225cc95c678121c"
+# Your Auth Token from twilio.com/console
+auth_token  = "d0027d317a39a9df31de7a04e62009ec"
+client = Client(account_sid, auth_token)
+
+### Criar um Algoritmo para analisar dados de 6 meses de uma empresa onde vai mostrar o vendedor
+### e o valor de vendas obtidas,onde algum vendedor,que tiver batido a meta de vendas 
+### acima de 55000,Vai ser enviado um SMS para o patrão que o vendedor bateu meta, e ganhar uma viagem! Vamos no passo a passo..
+
+
+#### Passo1: Abrir planilha de dados dos 6 meses a serem analisados,são arquivos em excel
+#### Passo2: Verificar naqueles arquivos, o nome do vendedor e as vendas,se alguém obteve meta acima de 55000
+#### Passo3: Se for maior que 55000, enviar um SMS notificando o nome,o Mês, e as vendas.
+
+lista_meses = ['janeiro','fevereiro','março','abril','maio','junho']
+for mes in lista_meses:
+    tabela_vendas = pd.read_excel(f'{mes}.xlsx')
+    if (tabela_vendas['Vendas'] > 55000).any():
+        vendedor = tabela_vendas.loc[tabela_vendas['Vendas'] > 55000,'Vendedor'].values[0]
+        vendas = tabela_vendas.loc[tabela_vendas['Vendas'] > 55000,'Vendas'].values[0]
+        print(f'No mês de {mes},alguém bateu a meta de 55000! Vendedor: {vendedor}, Suas vendas:{vendas}')
+        message = client.messages.create(
+            to="+5511977221209", 
+            from_="+13156023430",
+            body=f'No mês de {mes},alguém bateu a meta de 55000! Vendedor: {vendedor}, Suas vendas:{vendas}')
+        print(message.sid)
